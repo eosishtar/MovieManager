@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MovieManager": {
+      "commandName": "Project",
+      "commandLineArgs": "copy-file"
+    }
+  }
+}
