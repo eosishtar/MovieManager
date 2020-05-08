@@ -15,6 +15,8 @@ namespace MovieManager.Models
 
         public string MovieDbServerUrl { get; set; }
 
+        public int TorrentSeedDays { get; set; } = 7;
+
     }
 
 }

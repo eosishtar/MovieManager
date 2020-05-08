@@ -62,7 +62,7 @@ namespace MovieManager
 
                 //Still Work in Progress Items 
                 case "remove-torrents":
-                    FromTorrentFiles();
+                    RemoveTorrentFiles();
                     break;
 
                 case "test-moviedb-api":
@@ -76,16 +76,21 @@ namespace MovieManager
             _logger.LogInformation($"MovieManager completed cmd '{args[0]}'.");
         }
 
-        private static void FromTorrentFiles()
+        private static void RemoveTorrentFiles()
         {
             var t = new FileFunctions(_settings);
             var toProcess = t.FilesAlreadyCopied();
 
+            //check setting, else use default 7
+            int seedDays = (_settings.TorrentSeedDays <= 0) ? _settings.TorrentSeedDays : 7;
+
+            var today = DateTime.Now;
+
             foreach (var item in toProcess)
             {
-                if (item.Item1.ToString() == "Check Date")
+                if (Convert.ToDateTime(item.Item2) < today.AddDays(seedDays))
                 {
-                    //TODO: check if can delete the torrent,
+                    //TODO: Delete file out of download so it cant seed anymore
                 }
             }
         }
@@ -290,7 +295,8 @@ namespace MovieManager
                 CompletedTVPath = config.GetSection("PathConfig:CompleteTVPath").Value ?? throw new ArgumentNullException("CompleteTVPath"),
                 Extensions = extensions,
                 MovieDbApiKey = config.GetSection("MovieDbApi:ApiKey").Value ?? throw new ArgumentNullException("ApiKey"),
-                MovieDbServerUrl = config.GetSection("MovieDbApi:ServerUrl").Value ?? throw new ArgumentNullException("ServerUrl")
+                MovieDbServerUrl = config.GetSection("MovieDbApi:ServerUrl").Value ?? throw new ArgumentNullException("ServerUrl"),
+                TorrentSeedDays = Convert.ToInt32(config.GetSection("Torrents:SeedDays").Value)
             };
 
             //check the paths 
