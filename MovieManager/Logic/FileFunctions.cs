@@ -124,10 +124,11 @@ namespace MovieManager.Logic
 
         public List<DuplicateItemModel> GetDuplicatesCopied()
         {
-            List<string> directoriesToSearch = new List<string>();
-
-            directoriesToSearch.Add(_settings.CompletedMoviePath);
-            directoriesToSearch.Add(_settings.CompletedTVPath);
+            List<string> directoriesToSearch = new List<string>
+            {
+                _settings.CompletedMoviePath,
+                _settings.CompletedTVPath
+            };
 
             var dupItems = new List<DuplicateItemModel>();
             var uniqueFileName = new SortedList();

@@ -18,7 +18,7 @@ namespace MovieManager.Logic
         public MovieDbApi(Settings settings)
         {
             this._settings = settings;
-           // this._httpClient = GetHttpClient();
+           this._httpClient = GetHttpClient();
 
         }
 
@@ -48,9 +48,10 @@ namespace MovieManager.Logic
             //if (serverUrl == null) { throw new ArgumentNullException(nameof(serverUrl)); }
             //if (user == null) { throw new ArgumentNullException(nameof(user)); }
 
-            var client = new System.Net.Http.HttpClient();
-
-            client.BaseAddress = new Uri(serverUrl);
+            var client = new System.Net.Http.HttpClient
+            {
+                BaseAddress = new Uri(serverUrl)
+            };
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(user)));
 

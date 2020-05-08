@@ -97,8 +97,9 @@ namespace MovieManager
 
         private static void TestMovieDbApi()
         {
-            var movieapi = new MovieDbApi(_settings);
-            var test = movieapi.TestMovieDbApiAsync();
+            //TODO: Work in Progress
+            //var movieapi = new MovieDbApi(_settings);
+            //var test = movieapi.TestMovieDbApiAsync();
         }
 
         private static void CheckDuplicates()
