@@ -200,14 +200,10 @@ namespace MovieManager.Logic
             return seasonPath;
         }
 
-        
-
         private bool CheckCopyThisFile(string fileExtension)
         {
             return _settings.Extensions.Any(x => x.Contains(fileExtension.ToUpper()));
         }
-
-
 
         private static void LogToFile(string message)
         {
@@ -219,8 +215,6 @@ namespace MovieManager.Logic
                 File.AppendAllText(path, DateTime.Now.ToString("yyyyMMdd HHmmss") + ": " + message + Environment.NewLine);
             }
         }
-
-
 
         //this method will delete the files and then the directory
         public void DeleteDirectory(string target_dir)
@@ -241,6 +235,5 @@ namespace MovieManager.Logic
 
             Directory.Delete(target_dir, false);
         }
-
     }
 }

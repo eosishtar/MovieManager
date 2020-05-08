@@ -56,6 +56,10 @@ namespace MovieManager
                     RemoveDuplicates();
                     break;
 
+                case "check-duplicates":
+                    CheckDuplicates();
+                    break;
+
                 //Still Work in Progress Items 
                 case "remove-torrents":
                     FromTorrentFiles();
@@ -92,12 +96,70 @@ namespace MovieManager
             var test = movieapi.TestMovieDbApiAsync();
         }
 
+        private static void CheckDuplicates()
+        {
+            var fileFuncs = new FileFunctions(_settings);
+
+            var dupItems = fileFuncs.GetDuplicatesCopied();
+
+            if (dupItems.Count == 0)
+            {
+                Console.WriteLine($"No duplicates were found.");
+            }
+
+            //write the findings to temp location
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var path = Path.Combine(desktop, "DuplicateFiles.txt");
+            Helper.DeleteFile(path);
+
+            File.AppendAllText(path,   "Duplicate files found..." + Environment.NewLine);
+            foreach (var item in dupItems)
+            {
+                File.AppendAllText(path, 
+                    Environment.NewLine +
+                        $"{item.DuplicateName}" +
+                        Environment.NewLine +
+                        string.Format("         ", 25) +  $"{item.FullPath1}         {item.FullPath2}");
+            }
+
+            _logger.LogInformation($"Duplicates found. Please check file '{path}'.");
+            Console.ReadKey();
+        }
 
         private static void RemoveDuplicates()
         {
             var fileFuncs = new FileFunctions(_settings);
 
+            var dupItems = fileFuncs.GetDuplicatesCopied();
+
+            if (dupItems.Count == 0)
+            {
+                Console.WriteLine($"No duplicates were found.");
+            }
+
+            foreach (var item in dupItems)
+            {
+                var path1 = Path.GetDirectoryName(item.FullPath1);
+                var path2 = Path.GetDirectoryName(item.FullPath2);
+
+                //delete the duplicate in another directory
+                if (path1.Contains(item.DuplicateName))
+                {
+                    File.SetAttributes(Path.Combine(path2, item.DuplicateName), FileAttributes.Normal);
+                    File.Delete(Path.Combine(path2, item.DuplicateName));
+
+                    _logger.LogInformation($"Duplicate file '{item.DuplicateName}' deleted from '{path2}'.");
+                }
+                else
+                {
+                    File.SetAttributes(Path.Combine(path1, item.DuplicateName), FileAttributes.Normal);
+                    File.Delete(Path.Combine(path1, item.DuplicateName));
+
+                    _logger.LogInformation($"Duplicate file '{item.DuplicateName}' deleted from '{path1}'.");
+                }
+            }
         }
+
 
 
         private static void CopyFilesToDrive()
@@ -166,6 +228,8 @@ namespace MovieManager
 
             Console.WriteLine("Usage:");
             Console.WriteLine($" {exeName} copy-file");
+            Console.WriteLine($" {exeName} check-duplicates");
+            Console.WriteLine($" {exeName} remove-duplicates");
 
             Environment.Exit(1);
         }

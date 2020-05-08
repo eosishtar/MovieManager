@@ -1,9 +1,11 @@
 ﻿using MovieManager.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MovieManager.Logic
 {
@@ -95,7 +97,7 @@ namespace MovieManager.Logic
                     checkItem = Path.GetFileName(file);
                     copyFile = !filesAlreadyCopied.Any(x => x.Item1.Contains(checkItem));
 
-                    //add the movie to be copied
+                    //add the file to be copied
                     if (copyFile & !string.IsNullOrEmpty(checkItem))
                     {
                         filestoCopy.Add(file);
@@ -122,11 +124,43 @@ namespace MovieManager.Logic
 
         public List<DuplicateItemModel> GetDuplicatesCopied()
         {
+            List<string> directoriesToSearch = new List<string>();
 
+            directoriesToSearch.Add(_settings.CompletedMoviePath);
+            directoriesToSearch.Add(_settings.CompletedTVPath);
 
-            return null;
+            var dupItems = new List<DuplicateItemModel>();
+            var uniqueFileName = new SortedList();
+
+            foreach (var dir in directoriesToSearch)
+            {
+                //get all the files in each directory
+                var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    var fi = new FileInfo(file);
+                    
+                    try
+                    {
+                        //using a sorted list should guarentee unique file names
+                        uniqueFileName.Add(fi.Name, fi.FullName);
+                    }
+                    catch (Exception ex)
+                    {
+                        dupItems.Add(new DuplicateItemModel
+                        {
+                            DuplicateName = fi.Name,
+                            FullPath1  = fi.FullName,
+                            // need to find this in the sortedList
+                            FullPath2 = uniqueFileName.GetByIndex(uniqueFileName.IndexOfKey(fi.Name)).ToString(),
+                        });
+                    }
+                }
+            }
+
+            return dupItems;
         }
-
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -79,6 +80,15 @@ namespace MovieManager.Logic
             else
             {
                 return null;
+            }
+        }
+
+        public static void DeleteFile(string fullpath)
+        {
+            if (File.Exists(fullpath))
+            {
+                File.SetAttributes(fullpath, FileAttributes.Normal);
+                File.Delete(fullpath);
             }
         }
     }

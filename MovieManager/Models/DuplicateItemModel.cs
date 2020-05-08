@@ -6,9 +6,8 @@ namespace MovieManager.Models
 {
     public class DuplicateItemModel
     {
-        public string DupicateItem1 { get; set; }
-        public string DupicateItem2 { get; set; }
-        public string DupicateFullPathItem1 { get; set; }
-        public string DupicateFullPathItem2 { get; set; }
+        public string DuplicateName { get; set; }
+        public string FullPath1 { get; set; }
+        public string FullPath2 { get; set; }
     }
 }
