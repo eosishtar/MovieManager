@@ -21,7 +21,7 @@ namespace MovieManager.Logic
             DirectoryInfo source = new DirectoryInfo(Path.Combine(_settings.DownloadPath, fileName));
 
             //determine if the file is a movie or tv series
-            var fileType = CheckIfMovieOrTvSeries(source.Name);
+            var fileType = Helper.CheckIfMovieOrTvSeries(source.Name);
             DirectoryInfo target = null;
 
             switch (fileType)
@@ -73,7 +73,7 @@ namespace MovieManager.Logic
 
                     //rename the newly copied folder
                     var movieName = GetMovieName(source.Name);
-                    var extension = GetFileType(fi.Name);
+                    var extension = Helper.GetFileType(fi.Name);
                     var formattedMovieName = $"{movieName}.{extension}";
 
                     var newFile = Path.Combine(_settings.CompletedMoviePath, movieName);
@@ -200,69 +200,14 @@ namespace MovieManager.Logic
             return seasonPath;
         }
 
-        private int CheckIfMovieOrTvSeries(string fullName)
-        {
-            int yearStart = fullName.IndexOf("20");
-            int seasonStart = fullName.IndexOf("S0");
-
-            if (yearStart > -1 && fullName.Length > 4)
-            {
-                int year;
-                var movieYear = fullName.Substring(yearStart, 4);
-                if (int.TryParse(movieYear, out year) && (year >= 1942 && year <= 2030))
-                {
-                    return (int)FileType.Movie;
-                }
-            }
-
-
-            if (seasonStart > -1 && fullName.Length > 4)
-            {
-                var season = fullName.Substring(seasonStart, 3);
-                var seasonNumber = season.LastIndexOf(season, StringComparison.InvariantCultureIgnoreCase);
-
-                var validInt = int.TryParse(seasonNumber.ToString(), out int result);
-                if (validInt)
-                {
-                    return (int)FileType.TVSeries;
-                }
-            }
-
-            if (GetFileType(fullName) == "MP3")
-            {
-                return (int)FileType.MusicFile;
-            }
-            else if (GetFileType(fullName) == "SRT")
-            {
-                return (int)FileType.Subtitle;
-            }
-
-            return 0;
-        }
+        
 
         private bool CheckCopyThisFile(string fileExtension)
         {
             return _settings.Extensions.Any(x => x.Contains(fileExtension.ToUpper()));
         }
 
-        private string GetFileType(string fileName)
-        {
-            if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException(nameof(fileName));
 
-            var extensionStart = fileName.LastIndexOf(".", fileName.Length);
-
-            if (extensionStart > 0)
-            {
-                int extensionLength = (fileName.Length - extensionStart);
-                var extension = fileName.Substring(extensionStart + 1, extensionLength - 1);
-                return extension.ToUpper();
-            }
-            else
-            {
-                return null;
-            }
-        }
 
         private static void LogToFile(string message)
         {

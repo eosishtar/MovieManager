@@ -19,6 +19,11 @@ namespace MovieManager.Logic
         public List<Tuple<string, string>> FilesAlreadyCopied()
         {
             var alreadyCopiedMovies = Path.Combine(_settings.DownloadPath, globals.FileCopyName);
+            if (!Directory.Exists(_settings.DownloadPath))
+            {
+                Directory.CreateDirectory(_settings.DownloadPath);
+            }
+
             if (!File.Exists(alreadyCopiedMovies))
             {
                 File.Create(alreadyCopiedMovies);
@@ -53,6 +58,12 @@ namespace MovieManager.Logic
         {
             var filesAlreadyCopied = FilesAlreadyCopied();
             var directories = Directory.GetDirectories(_settings.DownloadPath, "*");
+
+            if (directories.Count() == 0)
+            {
+                Console.WriteLine($"There are no items in '{_settings.DownloadPath}'");
+                return new List<string>();
+            }
 
             var filestoCopy = new List<string>();
             string checkItem = "";
@@ -109,41 +120,12 @@ namespace MovieManager.Logic
             return _settings.Extensions.Any(x => x.Contains(fileExtension.ToUpper()));
         }
 
-        //old code
-        //public List<string> GetFilesToCopy()
-        //{
-        //    var filesAlreadyCopied = FilesAlreadyCopied();
-        //    var filesInDownloadDir = Directory.GetDirectories(_settings.DownloadPath, "*");
+        public List<DuplicateItemModel> GetDuplicatesCopied()
+        {
 
-        //    var filestoCopy = new List<string>();
-        //    string checkItem = "";
 
-        //    foreach (var item in filesInDownloadDir)
-        //    {
-
-        //        bool copyFile = true;
-
-        //        checkItem = item.Replace(_settings.DownloadPath, "").Trim();
-
-        //        //check if havent copied the file previously
-        //        for (int i = 0; i < filesAlreadyCopied.Count; i++)
-        //        {
-        //            if (checkItem == filesAlreadyCopied[i].Trim())
-        //            {
-        //                copyFile = false;   //dont copy file
-        //                break;
-        //            }
-        //        }
-
-        //        //add the movie to be copied
-        //        if (copyFile & !string.IsNullOrEmpty(checkItem))
-        //        {
-        //            filestoCopy.Add(checkItem);
-        //        }
-        //    }
-
-        //    return filestoCopy;
-        //}
+            return null;
+        }
 
 
     }

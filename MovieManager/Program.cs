@@ -52,6 +52,11 @@ namespace MovieManager
                     CopyFilesToDrive();
                     break;
 
+                case "remove-duplicates":
+                    RemoveDuplicates();
+                    break;
+
+                //Still Work in Progress Items 
                 case "remove-torrents":
                     FromTorrentFiles();
                     break;
@@ -86,6 +91,14 @@ namespace MovieManager
             var movieapi = new MovieDbApi(_settings);
             var test = movieapi.TestMovieDbApiAsync();
         }
+
+
+        private static void RemoveDuplicates()
+        {
+            var fileFuncs = new FileFunctions(_settings);
+
+        }
+
 
         private static void CopyFilesToDrive()
         {
