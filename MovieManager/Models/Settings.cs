@@ -17,6 +17,10 @@ namespace MovieManager.Models
 
         public int TorrentSeedDays { get; set; } = 7;
 
+        public bool SampleVideoDelete { get; set; }
+
+        public int SampleSizeLimit { get; set; } = 20;
+
     }
 
 }

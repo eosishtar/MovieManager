@@ -166,8 +166,6 @@ namespace MovieManager
             }
         }
 
-
-
         private static void CopyFilesToDrive()
         {
             var filefuncs = new FileFunctions(_settings);
@@ -237,7 +235,7 @@ namespace MovieManager
             Console.WriteLine($" {exeName} check-duplicates");
             Console.WriteLine($" {exeName} remove-duplicates");
 
-            Environment.Exit(1);
+            Console.ReadKey();
         }
 
         private static void BuildServiceProvider()
@@ -297,7 +295,9 @@ namespace MovieManager
                 Extensions = extensions,
                 MovieDbApiKey = config.GetSection("MovieDbApi:ApiKey").Value ?? throw new ArgumentNullException("ApiKey"),
                 MovieDbServerUrl = config.GetSection("MovieDbApi:ServerUrl").Value ?? throw new ArgumentNullException("ServerUrl"),
-                TorrentSeedDays = Convert.ToInt32(config.GetSection("Torrents:SeedDays").Value)
+                TorrentSeedDays = Convert.ToInt32(config.GetSection("Torrents:SeedDays").Value),
+                SampleVideoDelete = bool.TryParse(config.GetSection("SampleVideos:EnableDelete").Value, out bool result),
+                SampleSizeLimit = Convert.ToInt32(config.GetSection("SampleVideos:SizeLimitCheck").Value)
             };
 
             //check the paths 

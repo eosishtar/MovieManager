@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//It handles the conversion and formatting. https://github.com/omar/ByteSize
+using ByteSizeLib;
 
 namespace MovieManager.Logic
 {
@@ -82,15 +84,11 @@ namespace MovieManager.Logic
                     bool copyFile = true;
 
                     //check if can copy this file
-                    var extension = Path.GetExtension(file);
-                    var canCopyThisFile = CheckCopyThisFile(extension.Substring(1, extension.Length - 1));
+                    var fi = new FileInfo(file);
+                    var canCopyThisFile = CheckCopyThisFile(fi);
                     
                     //dont bother checking if cant copy this type of file....
                     if (!canCopyThisFile)
-                        continue;
-
-                    //check that u dont copy sample avis
-                    if (file.Contains("SAMPLE", StringComparison.InvariantCultureIgnoreCase))
                         continue;
 
                     //check if havent copied the file previously
@@ -117,9 +115,24 @@ namespace MovieManager.Logic
             return filestoCopy;
         }
 
-        private bool CheckCopyThisFile(string fileExtension)
+        private bool CheckCopyThisFile(FileInfo fileInfo)
         {
-            return _settings.Extensions.Any(x => x.Contains(fileExtension.ToUpper()));
+            //check that u dont copy sample avis
+            if (_settings.SampleVideoDelete)
+            {
+                if (fileInfo.Name.Contains("SAMPLE", StringComparison.InvariantCultureIgnoreCase))
+                    return false;
+
+                var filesize = ByteSize.FromBytes(fileInfo.Length);
+                if (filesize.MegaBytes < Convert.ToInt64(_settings.SampleSizeLimit))
+                {
+                    return false;
+                }
+            }
+
+            string formattedExt = fileInfo.Extension.Replace(".", "").Trim();
+
+            return _settings.Extensions.Any(x => x.Contains(formattedExt.ToUpper()));
         }
 
         public List<DuplicateItemModel> GetDuplicatesCopied()
@@ -141,6 +154,11 @@ namespace MovieManager.Logic
                 foreach (var file in files)
                 {
                     var fi = new FileInfo(file);
+
+                    if (!CheckCopyThisFile(fi))
+                    {
+                        Helper.DeleteFile(fi.FullName, true);
+                    }
                     
                     try
                     {

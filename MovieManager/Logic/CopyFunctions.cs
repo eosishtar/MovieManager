@@ -200,11 +200,6 @@ namespace MovieManager.Logic
             return seasonPath;
         }
 
-        private bool CheckCopyThisFile(string fileExtension)
-        {
-            return _settings.Extensions.Any(x => x.Contains(fileExtension.ToUpper()));
-        }
-
         private static void LogToFile(string message)
         {
             lock (typeof(CopyFunctions))

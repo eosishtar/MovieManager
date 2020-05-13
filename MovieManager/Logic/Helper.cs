@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,10 +11,8 @@ namespace MovieManager.Logic
     {
         public static int CheckIfMovieOrTvSeries(string fullName)
         {
-            int yearStart = fullName.IndexOf("20");
-            int seasonStart = fullName.IndexOf("S0");
-
             //check if could be TV Series
+            int seasonStart = fullName.IndexOf("S0");
             var foundTVSeries = Regex.IsMatch(fullName, @"^.*S\d\dE\d\d", RegexOptions.IgnoreCase);
             if (foundTVSeries && seasonStart > -1 && fullName.Length > 4)
             {
@@ -28,10 +27,10 @@ namespace MovieManager.Logic
             }
 
             //check if could be movie
+            int yearStart = fullName.IndexOf("20");
             if (yearStart > -1 && fullName.Length > 4)
             {
                 //the move check needs more work
-
                 int year;
                 var movieYear = fullName.Substring(yearStart, 4);
 
@@ -69,12 +68,12 @@ namespace MovieManager.Logic
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
 
-            var extensionStart = fileName.LastIndexOf(".", fileName.Length);
+            int extensionStart = fileName.LastIndexOf(".", fileName.Length);
 
             if (extensionStart > 0)
             {
                 int extensionLength = (fileName.Length - extensionStart);
-                var extension = fileName.Substring(extensionStart + 1, extensionLength - 1);
+                string extension = fileName.Substring(extensionStart + 1, extensionLength - 1);
                 return extension.ToUpper();
             }
             else
@@ -83,13 +82,31 @@ namespace MovieManager.Logic
             }
         }
 
-        public static void DeleteFile(string fullpath)
+        public static void DeleteFile(string fullpath, bool deleteDirectory = false)
         {
             if (File.Exists(fullpath))
             {
                 File.SetAttributes(fullpath, FileAttributes.Normal);
                 File.Delete(fullpath);
+
+                if (deleteDirectory)
+                {
+                    //remove the file and get the path
+                    string[] paths = fullpath.Split('\\');
+                    var path = paths.Take(paths.Count() - 1);
+                    var folderPath = string.Join("\\", path) + "\\";
+
+                    if (Directory.Exists(folderPath))
+                    {
+                        //only delete directory if empty 
+                        if (!Directory.EnumerateFiles(folderPath).Any())
+                        {
+                            Directory.Delete(folderPath, false);
+                        }
+                    }
+                }
             }
         }
+
     }
 }
