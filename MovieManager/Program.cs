@@ -91,6 +91,7 @@ namespace MovieManager
                 if (Convert.ToDateTime(item.Item2) < today.AddDays(seedDays))
                 {
                     //TODO: Delete file out of download so it cant seed anymore
+                    _logger.LogInformation($"File '{item.Item1}' removed from '{_settings.DownloadPath}'.");
                 }
             }
         }

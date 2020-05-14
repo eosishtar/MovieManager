@@ -70,7 +70,6 @@ namespace MovieManager.Logic
             }
 
             var filestoCopy = new List<string>();
-            string checkItem = "";
 
             Console.WriteLine($"Checking files to copy in '{_settings.DownloadPath}'");
 
@@ -85,18 +84,14 @@ namespace MovieManager.Logic
 
                     //check if can copy this file
                     var fi = new FileInfo(file);
-                    var canCopyThisFile = CheckCopyThisFile(fi);
-                    
-                    //dont bother checking if cant copy this type of file....
-                    if (!canCopyThisFile)
+                    if(!CheckCopyThisFile(fi))
                         continue;
 
                     //check if havent copied the file previously
-                    checkItem = Path.GetFileName(file);
-                    copyFile = !filesAlreadyCopied.Any(x => x.Item1.Contains(checkItem));
+                    copyFile = !filesAlreadyCopied.Any(x => x.Item1.Contains(fi.Name));
 
                     //add the file to be copied
-                    if (copyFile & !string.IsNullOrEmpty(checkItem))
+                    if (copyFile & !string.IsNullOrEmpty(fi.Name))
                     {
                         filestoCopy.Add(file);
                     }
@@ -124,7 +119,7 @@ namespace MovieManager.Logic
                     return false;
 
                 var filesize = ByteSize.FromBytes(fileInfo.Length);
-                if (filesize.MegaBytes < Convert.ToInt64(_settings.SampleSizeLimit))
+                if (filesize.MegaBytes < Convert.ToInt64(_settings.SampleSizeLimit) && fileInfo.Extension.ToUpper() == ".AVI")
                 {
                     return false;
                 }
