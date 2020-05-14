@@ -9,10 +9,20 @@ namespace MovieManager.Logic
 {
     public static class Helper
     {
-        public static int CheckIfMovieOrTvSeries(string fullName)
+        public static int IdentifyFileType(string fullName)
         {
+            //Check the extension first
+            if (GetFileType(fullName) == "MP3")
+            {
+                return (int)FileType.MusicFile;
+            }
+            else if (GetFileType(fullName) == "SRT")
+            {
+                return (int)FileType.Subtitle;
+            }
+
             //check if could be TV Series
-            int seasonStart = fullName.IndexOf("S0");
+            int seasonStart = fullName.IndexOf("S0", StringComparison.InvariantCultureIgnoreCase);
             var foundTVSeries = Regex.IsMatch(fullName, @"^.*S\d\dE\d\d", RegexOptions.IgnoreCase);
             if (foundTVSeries && seasonStart > -1 && fullName.Length > 4)
             {
@@ -48,16 +58,7 @@ namespace MovieManager.Logic
 
                 //remove the year we thought, and check again
                 var trimmedName = fullName.Replace(movieYear, "");
-                return CheckIfMovieOrTvSeries(trimmedName);
-            }
-
-            if (GetFileType(fullName) == "MP3")
-            {
-                return (int)FileType.MusicFile;
-            }
-            else if (GetFileType(fullName) == "SRT")
-            {
-                return (int)FileType.Subtitle;
+                return IdentifyFileType(trimmedName);
             }
 
             return 0;

@@ -2,7 +2,7 @@
   "profiles": {
     "MovieManager": {
       "commandName": "Project",
-      "commandLineArgs": "remove-duplicates"
+      "commandLineArgs": "copy-file"
     }
   }
 }

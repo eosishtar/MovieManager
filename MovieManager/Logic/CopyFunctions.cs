@@ -21,7 +21,7 @@ namespace MovieManager.Logic
             DirectoryInfo source = new DirectoryInfo(Path.Combine(_settings.DownloadPath, fileName));
 
             //determine if the file is a movie or tv series
-            var fileType = Helper.CheckIfMovieOrTvSeries(source.Name);
+            var fileType = Helper.IdentifyFileType(source.Name);
             DirectoryInfo target = null;
 
             switch (fileType)

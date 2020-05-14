@@ -81,17 +81,21 @@ namespace MovieManager
             var t = new FileFunctions(_settings);
             var toProcess = t.FilesAlreadyCopied();
 
-            //check setting, else use default 7
-            int seedDays = (_settings.TorrentSeedDays <= 0) ? _settings.TorrentSeedDays : 7;
-
             var today = DateTime.Now;
 
             foreach (var item in toProcess)
             {
-                if (Convert.ToDateTime(item.Item2) < today.AddDays(seedDays))
+                var torrentComplete = Convert.ToDateTime(item.Item2).AddDays(_settings.TorrentSeedDays);
+
+                if (torrentComplete < today)
                 {
                     //TODO: Delete file out of download so it cant seed anymore
-                    _logger.LogInformation($"File '{item.Item1}' removed from '{_settings.DownloadPath}'.");
+                    //var deleteFile = new CopyFunctions(_settings);
+
+                    //var path = Path.Combine(_settings.DownloadPath, item.Item1);
+                    //deleteFile.DeleteDirectory(path);
+
+                    //_logger.LogInformation($"File '{item.Item1}' removed from '{path}'.");
                 }
             }
         }
