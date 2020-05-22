@@ -14,7 +14,7 @@ namespace MovieManager.Logic
             this._settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public string Copy(string fileName)
+        public (string, bool) Copy(string fileName)
         {
             if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(nameof(fileName));
 
@@ -23,6 +23,8 @@ namespace MovieManager.Logic
             //determine if the file is a movie or tv series
             var fileType = Helper.IdentifyFileType(source.Name);
             DirectoryInfo target = null;
+
+            bool fileCopied = false;
 
             switch (fileType)
             {
@@ -47,11 +49,11 @@ namespace MovieManager.Logic
 
                 case (int)FileType.MusicFile:
                     //not catering for this now
-                    return null;
+                    return (string.Empty, false);
 
                 default:
                     //dont know the type of file
-                    return null;
+                    return (string.Empty, false);
             }
 
 
@@ -70,6 +72,7 @@ namespace MovieManager.Logic
                 if (!File.Exists(Path.Combine(target.FullName, fi.Name)))
                 {
                     fi.CopyTo(moviePath, true);
+                    fileCopied = true;
 
                     //rename the newly copied folder
                     var movieName = GetMovieName(source.Name);
@@ -89,14 +92,14 @@ namespace MovieManager.Logic
 
                         File.Move(oldFile, newFile);
 
-                        return newFile;
+                        return (newFile, fileCopied);
                     }
                     catch (Exception ex)
                     {
                         //delete newly created file/folder
                         DeleteDirectory(target.FullName);
 
-                        return newFile;
+                        return (newFile, fileCopied);
                     }
                 }
                 else
@@ -111,19 +114,23 @@ namespace MovieManager.Logic
                 if (!File.Exists(Path.Combine(target.FullName, fi.Name)))
                 {
                     fi.CopyTo(moviePath, true);
+                    fileCopied = true;
                 }
-                return moviePath;
+                return (moviePath, fileCopied);
             }
             else if (fileType == (int)FileType.TVSeries)
             {
                 var tvPath = Path.Combine(target.FullName, fi.Name);
                 if (!File.Exists(tvPath))
                 {
+         
+
                     //copy file 
                     if (!File.Exists(tvPath))
                     {
                         fi.CopyTo(tvPath, true);
 
+                        fileCopied = true;
                         //move file outside folder, into season folder
                         var oldLocation = tvPath;
                         var newLocation = Path.Combine(target.Parent.FullName, fi.Name + "_temp");
@@ -148,7 +155,7 @@ namespace MovieManager.Logic
                         string newName = newLocation.Replace("_temp", "");
                         File.Move(newLocation, newName);
 
-                        return newName;
+                        return (newName, fileCopied);
                     }
                     else
                     {
@@ -159,7 +166,7 @@ namespace MovieManager.Logic
             }
 
             //nothing copied
-            return string.Empty;
+            return (string.Empty, false);
         }
 
         private string GetMovieName(string name)

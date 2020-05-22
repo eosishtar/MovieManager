@@ -70,6 +70,7 @@ namespace MovieManager
                     break;
 
                 default:
+                    ShowUsageExit();
                     break;
             }
 
@@ -188,7 +189,7 @@ namespace MovieManager
                     try
                     {
                         var fileCopied = logic.Copy(item);
-                        AddFileToCopyList(Path.GetFileName(item), fileCopied);
+                        AddFileToCopyList(Path.GetFileName(item), fileCopied.Item1, fileCopied.Item2);
                         itemCnt++;
 
                         var fileString = string.Format(item, Environment.NewLine);
@@ -204,7 +205,7 @@ namespace MovieManager
                             int fileNameEnd = rawFilePath.LastIndexOf("'");
                             var filePath = rawFilePath.Substring(fileNameStart, fileNameEnd - fileNameStart);    //Name of the file
 
-                            AddFileToCopyList(Path.GetFileName(item), filePath);
+                            AddFileToCopyList(Path.GetFileName(item), filePath, false);
                             continue;
                         }
 
@@ -218,17 +219,25 @@ namespace MovieManager
             }
         }
 
-        private static void AddFileToCopyList(string fileName, string destPath)
+        private static void AddFileToCopyList(string fileName, string destPath, bool copied)
         {
-            var filePath = Path.Combine(_settings.DownloadPath, globals.FileCopyName);
-
-            using (StreamWriter stream = new FileInfo(filePath).AppendText())
+            if (copied)
             {
-                var writeString = $"{fileName};{destPath};{DateTime.Now}";
-                stream.WriteLine(writeString);
-            }
+                var filePath = Path.Combine(_settings.DownloadPath, globals.FileCopyName);
 
-            Console.WriteLine($"Copied file '{fileName}' to '{destPath}'.");
+                using (StreamWriter stream = new FileInfo(filePath).AppendText())
+                {
+                    var writeString = $"{fileName};{destPath};{DateTime.Now}";
+                    stream.WriteLine(writeString);
+                }
+
+                Console.WriteLine($"Copied file '{fileName}' to '{destPath}'.");
+            }
+            else
+            {
+                //just display to the user the file was processed but not copied.
+                Console.WriteLine($"File '{fileName}' not copied. File already exists in '{destPath}'.");
+            }
         }
 
         private static void ShowUsageExit()
