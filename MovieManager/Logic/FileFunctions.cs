@@ -87,11 +87,8 @@ namespace MovieManager.Logic
                     if(!CheckCopyThisFile(fi))
                         continue;
 
-                    //check if havent copied the file previously, but exclude subtitle names.
-                    if(fi.Extension.ToUpper() != ".SRT")
-                    {
-                        copyFile = !filesAlreadyCopied.Any(x => x.Item1.Contains(fi.Name));
-                    }
+                    copyFile = !filesAlreadyCopied.Any(x => x.Item1
+                        .Contains(fi.Name, StringComparison.InvariantCultureIgnoreCase));
 
                     //add the file to be copied
                     if (copyFile & !string.IsNullOrEmpty(fi.Name))

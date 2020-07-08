@@ -47,8 +47,8 @@ namespace MovieManager.Logic
                 var thisYear = DateTime.Now;
 
                 //check if the year we found is more or less our current year.
-                if (Convert.ToInt32(movieYear) >= thisYear.AddYears(-10).Year
-                    && Convert.ToInt32(movieYear) <= thisYear.AddYears(10).Year)
+                if (Convert.ToInt32(movieYear) >= thisYear.AddYears(-20).Year
+                    && Convert.ToInt32(movieYear) <= thisYear.AddYears(20).Year)
                 {
                     if (int.TryParse(movieYear, out year) && (year >= 1942 && year <= 2030))
                     {

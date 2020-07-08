@@ -60,6 +60,10 @@ namespace MovieManager
                     CheckDuplicates();
                     break;
 
+                case "test-name-checker":
+                    TestNameChecker();
+                    break;
+
                 //Still Work in Progress Items 
                 case "remove-torrents":
                     RemoveTorrentFiles();
@@ -75,6 +79,51 @@ namespace MovieManager
             }
 
             _logger.LogInformation($"MovieManager completed cmd '{args[0]}'.");
+        }
+
+        private static void TestNameChecker()
+        {
+            string directory = @"D:\_Movies\";
+
+            var logic = new CopyFunctions(_settings); ;
+
+            //write the findings to temp location
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var path = Path.Combine(desktop, "NameChecker.txt");
+            Helper.DeleteFile(path);
+
+            var files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
+
+            File.AppendAllText(path, "Movie Name Test..." + Environment.NewLine);
+            foreach (var item in files)
+            {
+                FileInfo fi = new FileInfo(item);
+
+                //determine the name
+                if (!fi.Extension.ToUpper().Contains(".AVI") 
+                    && (!fi.Extension.ToUpper().Contains(".MKV"))
+                    && (!fi.Extension.ToUpper().Contains(".MP4")))
+                continue;
+                
+                var movieName = logic.GetMovieName(fi.Name);
+
+                string printString = "";
+                if (item.Length > 60)
+                {
+                    var shortPath = string.Format($"{item.Substring(0, 30)} ... {item.Substring(item.Length - 30, 30)}");
+                    printString = string.Format(" ", 25) + $"{movieName}         {shortPath}";
+                }
+                else
+                {
+                    printString = string.Format(" ", 25) + $"{movieName}         {item}";
+                }
+
+                Console.WriteLine(printString);
+
+                File.AppendAllText(path,
+                    Environment.NewLine +
+                        printString);
+            }
         }
 
         private static void RemoveTorrentFiles()
@@ -124,14 +173,14 @@ namespace MovieManager
             var path = Path.Combine(desktop, "DuplicateFiles.txt");
             Helper.DeleteFile(path);
 
-            File.AppendAllText(path,   "Duplicate files found..." + Environment.NewLine);
+            File.AppendAllText(path, "Duplicate files found..." + Environment.NewLine);
             foreach (var item in dupItems)
             {
-                File.AppendAllText(path, 
+                File.AppendAllText(path,
                     Environment.NewLine +
                         $"{item.DuplicateName}" +
                         Environment.NewLine +
-                        string.Format("         ", 25) +  $"{item.FullPath1}         {item.FullPath2}");
+                        string.Format("         ", 25) + $"{item.FullPath1}         {item.FullPath2}");
             }
 
             _logger.LogInformation($"Duplicates found. Please check file '{path}'.");
@@ -182,8 +231,6 @@ namespace MovieManager
 
             if (filesToCopy.Count > 0)
             {
-                string fileNames = null;
-
                 foreach (var item in filesToCopy)
                 {
                     try
@@ -191,9 +238,6 @@ namespace MovieManager
                         var fileCopied = logic.Copy(item);
                         AddFileToCopyList(Path.GetFileName(item), fileCopied.Item1, fileCopied.Item2);
                         itemCnt++;
-
-                        var fileString = string.Format(item, Environment.NewLine);
-                        fileNames = string.Concat(fileNames, fileString);
                     }
                     catch (Exception ex)
                     {
@@ -335,5 +379,9 @@ namespace MovieManager
                 _logger = _serviceProvider.GetRequiredService<ILogger<Program>>();
             }
         }
+
+
+
+
     }
 }
