@@ -30,7 +30,14 @@ namespace MovieManager.Logic
                 case (int)FileType.Subtitle:
                     var moviePath = source.Parent.ToString();
                     var movieName = moviePath.Replace("subtitles", "", StringComparison.InvariantCultureIgnoreCase);
-                    movieName = moviePath.Replace("subtitle", "", StringComparison.InvariantCultureIgnoreCase);
+
+                    var subtitlePath = "subtitle";
+                    if(moviePath.Contains("subtitles", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        subtitlePath = $"{subtitlePath}s"; 
+                    }
+                    movieName = moviePath.Replace(subtitlePath, "", StringComparison.InvariantCultureIgnoreCase);
+                    movieName = movieName.Replace(_settings.DownloadPath, "", StringComparison.InvariantCultureIgnoreCase);
 
                     var formattedMovieName = GetMovieName(movieName);
                     var actualMovieName = Path.GetFileName(formattedMovieName);
@@ -202,9 +209,17 @@ namespace MovieManager.Logic
 
         public string GetMovieName(string name)
         {
+            // get the list of reserved words
+            var reservedWords = Helper.ReservedWords();
+
+            var movieNameReplaced = name.ToLower();
+            foreach (var item in reservedWords)
+            {
+                movieNameReplaced = movieNameReplaced.Replace(item.ToLower(), "");
+            }
+
             //strip everything except numbers to try determine the year
-            string onlyNumbers = new string(name.Where(Char.IsDigit).ToArray());
-            var thisYear = DateTime.Now;
+            string onlyNumbers = new string(movieNameReplaced.Where(Char.IsDigit).ToArray());
 
             do
             {
@@ -214,8 +229,7 @@ namespace MovieManager.Logic
                     //get the year, working from right to left
                     string yearTest = onlyNumbers.Substring(onlyNumbers.Length - 4, 4);
 
-                    if (Convert.ToInt32(yearTest) >= thisYear.AddYears(-20).Year
-                        && Convert.ToInt32(yearTest) <= thisYear.AddYears(20).Year)
+                    if (Helper.LooksLikeYear(yearTest))
                     {
                         if (int.TryParse(yearTest, out year)) // && (year >= 1942 && year <= 2030))
                         {
@@ -242,6 +256,7 @@ namespace MovieManager.Logic
 
             throw new Exception($"Could not get movie name from '{name}'");
         }
+
 
         private string CreateTVPath(string name)
         {

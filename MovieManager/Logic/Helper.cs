@@ -9,6 +9,17 @@ namespace MovieManager.Logic
 {
     public static class Helper
     {
+
+        public static string[] ReservedWords()
+        {
+            var ReservedWords = new[]
+            {
+                "HDRip", "XviD", "BluRay", "DvDRip", "hevc", "bdrip", "Bluray", "x264", "h264", "AC3", "DTS", "480p", "720p", "1080p", "x0r", "mp4"
+            };
+
+            return ReservedWords;
+        }
+
         public static int IdentifyFileType(string fullName)
         {
             //Check the extension first
@@ -37,31 +48,65 @@ namespace MovieManager.Logic
             }
 
             //check if could be movie
-            int yearStart = fullName.IndexOf("20");
-            if (yearStart > -1 && fullName.Length > 4)
+            /*
+                the index check, sometimes picks up 720p and it causes it to fail
+
+                Solution is to have a set of reserved/known words to first be replaced in the moviename, 
+                then we can extract the last 4 digits (hopefully a year)
+            */
+
+            var movieNameReplaced = fullName.ToLower();
+            var reservedWords = Helper.ReservedWords();
+            foreach (var item in reservedWords)
             {
-                //the move check needs more work
-                int year;
-                var movieYear = fullName.Substring(yearStart, 4);
-
-                var thisYear = DateTime.Now;
-
-                //check if the year we found is more or less our current year.
-                if (Convert.ToInt32(movieYear) >= thisYear.AddYears(-20).Year
-                    && Convert.ToInt32(movieYear) <= thisYear.AddYears(20).Year)
-                {
-                    if (int.TryParse(movieYear, out year) && (year >= 1942 && year <= 2030))
-                    {
-                        return (int)FileType.Movie;
-                    }
-                }
-
-                //remove the year we thought, and check again
-                var trimmedName = fullName.Replace(movieYear, "");
-                return IdentifyFileType(trimmedName);
+                movieNameReplaced = movieNameReplaced.Replace(item.ToLower(), "");
             }
 
+            var checkmoviename = movieNameReplaced;
+            string onlyYear = new string(movieNameReplaced.Where(Char.IsDigit).ToArray());
+            if (onlyYear.Length > 4)
+            {
+                //take the last 4 digits only... 
+                onlyYear = onlyYear.Substring(onlyYear.Length - 4, 4);
+            }
+
+            if(LooksLikeYear(onlyYear))
+            {
+                return (int)FileType.Movie;
+            }
+
+
+            // int yearStart = fullName.IndexOf("20");
+            // if (yearStart > -1 && fullName.Length > 4)
+            // {
+            //     //the movie check needs more work
+            //     int year;
+            //     var movieYear = fullName.Substring(yearStart, 4);
+            //     movieYear = Regex.Replace(checkmoviename, "[^0-9]", "");
+
+            //     var thisYear = DateTime.Now;
+
+            //     //check if the year we found is more or less our current year.
+            //     if (Convert.ToInt32(movieYear) >= thisYear.AddYears(-20).Year
+            //         && Convert.ToInt32(movieYear) <= thisYear.AddYears(20).Year)
+            //     {
+            //         if (int.TryParse(movieYear, out year) && (year >= 1942 && year <= 2030))
+            //         {
+            //             return (int)FileType.Movie;
+            //         }
+            //     }
+
+            //     //remove the year we thought, and check again
+            //     var trimmedName = fullName.Replace(movieYear, "");
+            //     return IdentifyFileType(trimmedName);
+            // }
+
             return 0;
+        }
+
+        public static bool LooksLikeYear(string dataRound)
+        {
+            return Regex.IsMatch(dataRound, "^(19|20)[0-9][0-9]");
         }
 
         public static string GetFileType(string fileName)

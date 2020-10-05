@@ -16,6 +16,11 @@ namespace UnitTests
 
             foreach (var item in fileList)
             {
+                // if(item.Item1 == "Captain America -The First Avenger(2011).mp4")
+                // {
+                //     var debugHere = true;
+                // }
+
                 var result = Helper.IdentifyFileType(item.Item1);
                 Assert.AreEqual((int)item.Item2, result, $"Error: Did not identify correctly '{item.Item1}'");
             }
@@ -51,10 +56,12 @@ namespace UnitTests
             list.Add(new Tuple<string, FileType>("El.Camino.A.Breaking.Bad.Movie.2019.HDRip.XviD.AC3 - EVO.avi", FileType.Movie));
             list.Add(new Tuple<string, FileType>("Family.Guy.s01e03.Chitty.Chitty.Death.Bang.XviD - SChiZO.avi", FileType.TVSeries));
             list.Add(new Tuple<string, FileType>("Family.Guy.s01e05.A.Hero.Sits.Next.Door.XviD - SChiZO.avi", FileType.TVSeries));
-            list.Add(new Tuple<string, FileType>("40 Days and 40 Nights(2002).mkv", FileType.Subtitle));
+            list.Add(new Tuple<string, FileType>("40 Days and 40 Nights(2002).mkv", FileType.Movie));
             list.Add(new Tuple<string, FileType>("40D.and.40N8s.2002.DvDRip.x264 - WiNTeaM.srt", FileType.Subtitle));
-            list.Add(new Tuple<string, FileType>("Captain America -The First Avenger(2011).mp4", FileType.Subtitle));
+            list.Add(new Tuple<string, FileType>("Captain America -The First Avenger(2011).mp4", FileType.Movie));
             list.Add(new Tuple<string, FileType>("Captain America Civil War(2016).mp4", FileType.Movie));
+            list.Add(new Tuple<string, FileType>("Groundhog.Day.1993.720p.BRRip.x264-x0r.mkv", FileType.Movie));
+            list.Add(new Tuple<string, FileType>("The.Old.Guard.2020.HDRip.XviD.AC3-EVO.avi", FileType.Movie));
 
             return list;
         }
