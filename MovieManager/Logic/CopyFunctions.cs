@@ -28,6 +28,13 @@ namespace MovieManager.Logic
             switch (fileType)
             {
                 case (int)FileType.Subtitle:
+
+                    if (string.IsNullOrEmpty(_settings.CompletedMoviePath))
+                    {
+                        //movie path not set
+                        return ($"Movie path not set, so subtitles will be ignored.", false);
+                    }
+
                     var moviePath = source.Parent.ToString();
                     var movieName = moviePath.Replace("subtitles", "", StringComparison.InvariantCultureIgnoreCase);
 
@@ -46,10 +53,24 @@ namespace MovieManager.Logic
                     return CopySubtitle(source, target, actualMovieName);
 
                 case (int)FileType.Movie:
+
+                    if (string.IsNullOrEmpty(_settings.CompletedMoviePath))
+                    {
+                        //movie path not set
+                        return ($"Movie path not set, but file '{source.Name}' was found.", false);
+                    }
+
                     target = new DirectoryInfo(Path.Combine(_settings.CompletedMoviePath, source.Name));
                     return CopyMovie(source, target, fileName);
 
                 case (int)FileType.TVSeries:
+
+                    if (string.IsNullOrEmpty(_settings.CompletedTVPath))
+                    {
+                        //tv path path not set
+                        return ($"Movie path not set, but file '{source.Name}' was found.", false);
+                    }
+
                     //need to check and create the tv series directory
                     var tvPath = CreateTVPath(source.Name);
                     target = new DirectoryInfo(Path.Combine(tvPath, source.Name));

@@ -2,7 +2,7 @@
   "profiles": {
     "MovieManager": {
       "commandName": "Project",
-      "commandLineArgs": "test-name-checker"
+      "commandLineArgs": "copy-file"
     }
   }
 }

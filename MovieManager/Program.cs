@@ -256,6 +256,7 @@ namespace MovieManager
                         //log error 
                         _logger.LogError(ex, $"Error occurred while copying '{filesToCopy[itemCnt]}'. Error: {ex.Message}");
                         Console.WriteLine($"Error occurred while copying '{filesToCopy[itemCnt]}'. Error: {ex.Message}");
+                        Console.ReadKey();
                     }
                 }
 
@@ -348,22 +349,22 @@ namespace MovieManager
             var settings = new Settings
             {
                 DownloadPath = config.GetSection("PathConfig:DownloadPath").Value ?? throw new ArgumentNullException("DownloadPath"),
-                CompletedMoviePath = config.GetSection("PathConfig:CompleteMoviePath").Value ?? throw new ArgumentNullException("CompleteMoviePath"),
-                CompletedTVPath = config.GetSection("PathConfig:CompleteTVPath").Value ?? throw new ArgumentNullException("CompleteTVPath"),
+                CompletedMoviePath = config.GetSection("PathConfig:CompleteMoviePath").Value ?? null,
+                CompletedTVPath = config.GetSection("PathConfig:CompleteTVPath").Value ?? null,
                 Extensions = extensions,
-                MovieDbApiKey = config.GetSection("MovieDbApi:ApiKey").Value ?? throw new ArgumentNullException("ApiKey"),
-                MovieDbServerUrl = config.GetSection("MovieDbApi:ServerUrl").Value ?? throw new ArgumentNullException("ServerUrl"),
+                MovieDbApiKey = config.GetSection("MovieDbApi:ApiKey").Value ?? null,
+                MovieDbServerUrl = config.GetSection("MovieDbApi:ServerUrl").Value ?? null,
                 TorrentSeedDays = Convert.ToInt32(config.GetSection("Torrents:SeedDays").Value),
                 SampleVideoDelete = bool.TryParse(config.GetSection("SampleVideos:EnableDelete").Value, out bool result),
                 SampleSizeLimit = Convert.ToInt32(config.GetSection("SampleVideos:SizeLimitCheck").Value)
             };
 
             //check the paths 
-            if (!Directory.Exists(settings.CompletedMoviePath))
+            if (!string.IsNullOrEmpty(settings.CompletedMoviePath) && !Directory.Exists(settings.CompletedMoviePath))
             {
                 Directory.CreateDirectory(settings.CompletedMoviePath);
             }
-            if (!Directory.Exists(settings.CompletedTVPath))
+            if (!string.IsNullOrEmpty(settings.CompletedTVPath) && !Directory.Exists(settings.CompletedTVPath))
             {
                 Directory.CreateDirectory(settings.CompletedTVPath);
             }

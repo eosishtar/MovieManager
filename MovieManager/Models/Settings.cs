@@ -21,6 +21,7 @@ namespace MovieManager.Models
 
         public int SampleSizeLimit { get; set; } = 20;
 
+        public bool Enviroment { get; set; } = false;
     }
 
 }
